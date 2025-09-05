@@ -1,0 +1,7 @@
+DB_CONFIG = {
+    'host': 'localhost',
+    'user': 'your_username',
+    'password': 'your_password',
+    'database': 'douban',
+    'charset': 'utf8mb4'
+}
