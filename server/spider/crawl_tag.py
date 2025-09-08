@@ -1,3 +1,7 @@
+"""
+从豆瓣图书标签页面解析图书标签
+"""
+
 import json
 from bs4 import BeautifulSoup
 
@@ -11,16 +15,15 @@ def get_soup(markup):
 
 
 def get_book_type_dict():
-    # ... 这个函数保持不变，和上次的一样 ...
     tag_file = get_book_tag_file()
     if not tag_file:
-        print("错误：未能获取到豆瓣标签页面内容，无法解析。")
+        print("未能获取到豆瓣标签页面")
         return {}
     soup = get_soup(tag_file)
     tag_dict = {}
     tag_area = soup.select_one('#content > div > div.article > div:nth-child(2)')
     if not tag_area:
-        print("错误：未能找到指定的标签区域，请检查主区域选择器是否已过时。")
+        print("未能找到标签区域")
         return {}
     category_divs = tag_area.find_all('div', recursive=False)
     for category_div in category_divs:
@@ -72,13 +75,6 @@ def save_tags_to_db(tag_dict):
 
 
 if __name__ == '__main__':
-    db_config = {
-        'host': 'localhost',
-        'user': 'root',
-        'password': '123456',
-        'database': 'douban',
-        'charset': 'utf8mb4'
-    }
 
     print("开始从豆瓣解析图书标签...")
     parsed_tags = get_book_type_dict()
@@ -89,6 +85,6 @@ if __name__ == '__main__':
         # ensure_ascii=False： 允许使用非ascill字符
         print(json.dumps(parsed_tags, indent=4, ensure_ascii=False))
 
-        save_tags_to_db(parsed_tags, db_config)
+        save_tags_to_db(parsed_tags, DB_CONFIG)
     else:
         print("未能解析出任何数据，程序终止。")

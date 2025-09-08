@@ -1,3 +1,7 @@
+"""
+获取豆瓣图书标签页面的HTML内容
+"""
+
 from pathlib import Path
 
 from .tools.get_request import get_request

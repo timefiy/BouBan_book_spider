@@ -1,6 +1,6 @@
 import mysql.connector
 
-
+# QUESTION: 事务处理
 class BaseDAO(object):
     def __init__(self, db_config):
         self.db_config = db_config

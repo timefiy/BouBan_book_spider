@@ -40,12 +40,11 @@ def parse_book_detail(html_content):
                 return element.find_next_sibling('a').text.strip()
             return None
 
-        #[x]解析基本信息
+        #INFO：解析书的基本信息
         book_data['title'] = soup.select_one('h1 > span').text.strip()
         book_data['img_src'] = soup.select_one('#mainpic .nbg > img')['src'] if soup.select_one(
             '#mainpic .nbg > img') else None
 
-        #[ ] 作者名字与id的逻辑处理问题
         book_data['author_name'] = get_link_after_pl('作者')  # 假设先存作者名
         book_data['publisher'] = get_link_after_pl('出版社')
         book_data['producer'] = get_link_after_pl('出品方')
@@ -58,7 +57,7 @@ def parse_book_detail(html_content):
         book_data['series'] = get_link_after_pl('丛书')
         book_data['isbn'] = get_text_after_pl('ISBN')
 
-        #[x]解析评分信息
+        #INFO：解析评分信息
         rating_div = soup.select_one('#interest_sectl')
         if rating_div:
             rating_element = rating_div.select_one('strong.rating_num')
@@ -73,7 +72,7 @@ def parse_book_detail(html_content):
             for i in range(5, 0, -1):
                 star_element = rating_div.select_one(f'.stars{i} ~ .rating_per')
                 book_data[f'stars{i}_starstop'] = star_element.text.strip() if star_element else None
-        # [x]:数据清洗
+        # INFO：数据清洗
         if book_data.get('page_count'):
             page_match = re.search(r'\d+', str(book_data['page_count']))
             book_data['page_count'] = int(page_match.group()) if page_match else None
@@ -122,6 +121,9 @@ def parse_book_detail(html_content):
 
 
 def supplement_book_details():
+    """
+    补充书籍详情
+    """
     book_dao = BookDAO(DB_CONFIG)
 
     total_books_updated = 0
@@ -138,7 +140,7 @@ def supplement_book_details():
     print(f"任务目标：需要为 {total_count} 本书补充详细信息。")
 
     for index, book_id in enumerate(book_ids_to_update, 1):
-        print(f"\n--- 正在处理第 {index}/{total_count} 本书 (ID: {book_id}) ---")
+        print(f"\n正在处理第 {index}/{total_count} 本书 (ID: {book_id})")
         detail_url = f"https://book.douban.com/subject/{book_id}/"
         print(f"正在爬取: {detail_url}")
         detail_html = get_request(detail_url)
