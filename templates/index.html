@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}豆瓣图书数据分析 - 首页{% endblock %}
+
+{% block content %}
+<div class="text-center mb-5">
+    <h1 class="display-4 fw-bold text-primary mb-3">
+        <i class="bi bi-graph-up"></i> 豆瓣图书数据分析平台
+    </h1>
+</div>
+
+<!-- 功能卡片 -->
+<div class="row g-4 mb-5">
+    <div class="col-lg-6 col-md-6">
+        <div class="card feature-card h-100" style="background:#7d93f7;">
+            <div class="card-body text-white text-center p-4">
+                <div class="mb-3">
+                    <i class="bi bi-person-badge" style="font-size: 3rem;"></i>
+                </div>
+                <h3 class="card-title">作家国籍分析</h3>
+                <p class="card-text">分析不同国家作家在豆瓣图书库中的分布情况，探索全球文学作品的地域特色。</p>
+                <a href="/authors-analysis" class="btn btn-light btn-lg">
+                    <i class="bi bi-arrow-right"></i> 查看详情
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-6 col-md-6">
+        <div class="card feature-card h-100" style="background:#7d93f7;">
+            <div class="card-body text-white text-center p-4">
+                <div class="mb-3">
+                    <i class="bi bi-chat-dots" style="font-size: 3rem;"></i>
+                </div>
+                <h3 class="card-title">评论有用数分析</h3>
+                <p class="card-text">探索用户评论的有用性分布，分析高质量评论的特征和用户互动模式。</p>
+                <a href="/comments-analysis" class="btn btn-light btn-lg">
+                    <i class="bi bi-arrow-right"></i> 查看详情
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-6 col-md-6">
+        <div class="card feature-card h-100" style="background:#7d93f7;">
+            <div class="card-body text-white text-center p-4">
+                <div class="mb-3">
+                    <i class="bi bi-calendar3" style="font-size: 3rem;"></i>
+                </div>
+                <h3 class="card-title">评论时间分析</h3>
+                <p class="card-text">分析图书评论的时间热度趋势，发现经典图书的讨论热点时期。</p>
+                <a href="/time-analysis" class="btn btn-light btn-lg">
+                    <i class="bi bi-arrow-right"></i> 查看详情
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-6 col-md-6">
+        <div class="card feature-card h-100" style="background:#7d93f7;">
+            <div class="card-body text-white text-center p-4">
+                <div class="mb-3">
+                    <i class="bi bi-book-half" style="font-size: 3rem;"></i>
+                </div>
+                <h3 class="card-title">图书长度偏好</h3>
+                <p class="card-text">通过页数分析读者对不同篇幅图书的偏好，了解市场趋势和阅读习惯。</p>
+                <a href="/length-analysis" class="btn btn-light btn-lg">
+                    <i class="bi bi-arrow-right"></i> 查看详情
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

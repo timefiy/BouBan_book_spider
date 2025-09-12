@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+
+{% block title %}作家国籍分析 - 豆瓣图书数据分析{% endblock %}
+
+{% block content %}
+<h1><i class="bi bi-person-square"></i> 作家国籍分析</h1>
+
+<div class="chart-container" id="authorsChart">
+    <div class="loading"><i class="bi bi-arrow-repeat"></i> 正在加载数据...</div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+// DOMcontentLoaded:在DOM准备完毕后执行（不需要等待外部资源）
+document.addEventListener('DOMContentLoaded', function() {
+    const chart = echarts.init(document.getElementById('authorsChart'));
+    
+    // 显示加载动画
+    chart.showLoading();
+    
+    // 获取数据
+    fetch('/api/authors-by-country')
+        .then(response => response.json())
+        .then(data => {
+            chart.hideLoading();
+            
+            if (data.success && data.data.length > 0) {
+                const countries = data.data.map(item => item.country);
+                const counts = data.data.map(item => item.count);
+                
+                const option = {
+                    title: {
+                        text: '各国作家数量分布',
+                        left: 'center',
+                        textStyle: {
+                            fontSize: 18,
+                            fontWeight: 'bold'
+                        }
+                    },
+                    tooltip: {
+                        trigger: 'axis',
+                        axisPointer: {
+                            type: 'shadow'
+                        },
+                        formatter: function(params) {
+                            return `${params[0].name}<br/>作家数量: ${params[0].value} 人`;
+                        }
+                    },
+                    grid: {
+                        left: '3%',
+                        right: '4%',
+                        bottom: '3%',
+                        containLabel: true
+                    },
+                    xAxis: {
+                        type: 'category',
+                        data: countries,
+                        axisLabel: {
+                            rotate: 45,
+                            fontSize: 12
+                        }
+                    },
+                    yAxis: {
+                        type: 'value',
+                        name: '作家数量',
+                        nameTextStyle: {
+                            fontSize: 12
+                        }
+                    },
+                    series: [{
+                        name: '作家数量',
+                        type: 'bar',
+                        data: counts,
+                        itemStyle: {
+                            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                                {offset: 0, color: '#83bff6'},
+                                {offset: 0.5, color: '#188df0'},
+                                {offset: 1, color: '#188df0'}
+                            ])
+                        },
+                        emphasis: {
+                            itemStyle: {
+                                color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                                    {offset: 0, color: '#2378f7'},
+                                    {offset: 0.7, color: '#2378f7'},
+                                    {offset: 1, color: '#83bff6'}
+                                ])
+                            }
+                        }
+                    }]
+                };
+                
+                chart.setOption(option);
+            } else {
+                document.getElementById('authorsChart').innerHTML = 
+                    '<div style="text-align: center; color: #999; padding: 50px;">暂无数据</div>';
+            }
+        })
+        .catch(error => {
+            chart.hideLoading();
+            console.error('Error:', error);
+            document.getElementById('authorsChart').innerHTML = 
+                '<div style="text-align: center; color: #f44336; padding: 50px;">数据加载失败</div>';
+        });
+
+    window.addEventListener('resize', function() {
+        chart.resize();// Echarts:中的一个方法，响应式处理数据
+    });
+});
+</script>
+{% endblock %}

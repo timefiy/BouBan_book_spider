@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+
+{% block title %}评论时间分析 - 豆瓣图书数据分析{% endblock %}
+
+{% block content %}
+<h1><i class="bi bi-calendar3"></i> 评论时间分析</h1>
+
+<div class="chart-container" id="timeChart">
+    <div class="loading"><i class="bi bi-arrow-repeat"></i> 正在加载数据...</div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const chart = echarts.init(document.getElementById('timeChart'));
+    
+    chart.showLoading();
+    
+    fetch('/api/comment-time-analysis')
+        .then(response => response.json())
+        .then(data => {
+            chart.hideLoading();
+            
+            if (data.success && data.data.length > 0) {
+                // 处理数据，创建时间标签
+                const processedData = data.data.map(item => ({
+                    time: `${item.year}-${String(item.month).padStart(2, '0')}`,
+                    count: item.count,
+                    avgUseful: item.avg_useful
+                })).sort((a, b) => a.time.localeCompare(b.time));
+                
+                const times = processedData.map(item => item.time);
+                const counts = processedData.map(item => item.count);
+                const avgUseful = processedData.map(item => item.avgUseful);
+                
+                const option = {
+                    title: {
+                        text: '经典图书评论时间热度分析',
+                        left: 'center',
+                        textStyle: {
+                            fontSize: 18,
+                            fontWeight: 'bold'
+                        }
+                    },
+                    tooltip: {
+                        trigger: 'axis',
+                        axisPointer: {
+                            type: 'cross'
+                        },
+                        formatter: function(params) {
+                            let result = `时间: ${params[0].name}<br/>`;
+                            result += `评论数量: ${params[0].value}<br/>`;
+                            if (params[1]) {
+                                result += `平均有用数: ${params[1].value.toFixed(2)}`;
+                            }
+                            return result;
+                        }
+                    },
+                    legend: {
+                        data: ['评论数量', '平均有用数'],
+                        top: 30
+                    },
+                    grid: {
+                        left: '3%',
+                        right: '4%',
+                        bottom: '3%',
+                        containLabel: true
+                    },
+                    dataZoom: [
+                        {
+                            type: 'slider',
+                            show: true,
+                            xAxisIndex: [0],
+                            start: Math.max(0, 100 - (30 * 100 / times.length)), // 显示最近30个时间点
+                            end: 100
+                        }
+                    ],
+                    xAxis: {
+                        type: 'category',
+                        data: times,
+                        name: '时间（年-月）',
+                        nameLocation: 'middle',
+                        nameGap: 30,
+                        axisLabel: {
+                            rotate: 45,
+                            fontSize: 10
+                        }
+                    },
+                    yAxis: [
+                        {
+                            type: 'value',
+                            name: '评论数量',
+                            position: 'left',
+                            nameTextStyle: {
+                                color: '#5470c6'
+                            }
+                        },
+                        {
+                            type: 'value',
+                            name: '平均有用数',
+                            position: 'right',
+                            nameTextStyle: {
+                                color: '#ee6666'
+                            }
+                        }
+                    ],
+                    series: [
+                        {
+                            name: '评论数量',
+                            type: 'line',
+                            data: counts,
+                            lineStyle: {
+                                color: '#5470c6',
+                                width: 2
+                            },
+                            itemStyle: {
+                                color: '#5470c6'
+                            },
+                            areaStyle: {
+                                color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                                    {offset: 0, color: 'rgba(84, 112, 198, 0.3)'},
+                                    {offset: 1, color: 'rgba(84, 112, 198, 0.1)'}
+                                ])
+                            },
+                            symbol: 'circle',
+                            symbolSize: 4
+                        },
+                        {
+                            name: '平均有用数',
+                            type: 'line',
+                            yAxisIndex: 1,
+                            data: avgUseful,
+                            lineStyle: {
+                                color: '#ee6666',
+                                width: 2
+                            },
+                            itemStyle: {
+                                color: '#ee6666'
+                            },
+                            symbol: 'diamond',
+                            symbolSize: 5
+                        }
+                    ]
+                };
+                
+                chart.setOption(option);
+            } else {
+                document.getElementById('timeChart').innerHTML = 
+                    '<div style="text-align: center; color: #999; padding: 50px;">暂无数据</div>';
+            }
+        })
+        .catch(error => {
+            chart.hideLoading();
+            console.error('Error:', error);
+            document.getElementById('timeChart').innerHTML = 
+                '<div style="text-align: center; color: #f44336; padding: 50px;">数据加载失败</div>';
+        });
+    
+    window.addEventListener('resize', function() {
+        chart.resize();
+    });
+});
+</script>
+{% endblock %}
